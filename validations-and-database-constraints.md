@@ -1,7 +1,7 @@
 Validation vs. Database OR Validation _with_ the Database
 
 This post is purely hypothetical.
-It came up last week as we were discussing were to place validations and handle constraints on the database.
+It came up last week as we were discussing where to place validations and handle constraints on the database.
 
 Let's build a hypotheical application. 
 In that application, the user gets to send data through a run-of-the-mill  HTML form.
@@ -16,13 +16,13 @@ How will you deal with that new constraint?
 
 In Rails, you can use validations.
 Among those validation is a so-called ``uniqueness`` validation.
-What is does is perform a ``SELECT`` against your database and make sure that the record you are trying to enter will not collide against a pre-existing one.
+It performs a ``SELECT`` against your database and makes sure that the record you are trying to enter will not collide against a pre-existing one.
 That is a potential race-condition waiting to happen.
-Only reading does from the databse does not guarantee that the next insertion will not hit a unique constraint violation.
+Only reading from the database does not guarantee that the next insertion will not hit a unique constraint violation.
 Splitting the ``check`` phase (in this case the validation) from the actual operation means that there is a window of opportunity where  a seprate ``check`` will not see the soon-to-be-commited record.
 
 The only way to get around is to do check-and-set in a single, atomic operation.
-In this case, that means actually __writing__ to the database and checking for a violation of the unque constraint.
+In this case, that means actually __writing__ to the database and checking for a violation of the unique constraint.
 If no exception is raised, we know that value was/is correctly unique and we have reserved it.
 The next call to form validation will raise then raise a UniqueConstraintViolation and deny that record.
 
@@ -59,7 +59,7 @@ rescue UniqueConstraintViolationException => e
     record.errors[:foo] << "A record with foo #{record.foo} already exists"
 end
 
-The beauty here is that the code is small an coheisve.
+The beauty here is that the code is small and coheisve.
 Checking a unique constraint violation is part of the validation process.
 This becomes apparent in that the code in did not have to change, the code in the validator is small and concise and finally, the error message gets naturally added, without having to delegate it across multiple boundaries or doing anything odd.
 
@@ -95,7 +95,7 @@ That code will also have to be repeated across any method that inserts data that
 
 I am not sure which variation is better, though I am leaning towards adding the table and the proper validation class.
 It feels cleaner, more concise.
-Plus, there is the added benefit of having global uniqueness across more than one table (in case ``foo`` is an attribute that exists in more than one entitz).
+Plus, there is the added benefit of having global uniqueness across more than one table (in case ``foo`` is an attribute that exists in more than one entity).
 There is the question whether the _cost_ of carrying an extra table and binding one validation class to that table outweighs the _benefit_ of the cleaner code.
 
 Are the better designs out there that I might have overlooked? 
