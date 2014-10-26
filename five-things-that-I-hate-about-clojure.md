@@ -1,46 +1,58 @@
-- Isomorphism
-  - Great, so data and functions are represented using the same strucures. 
-  - Now I can't tell the difference anymore!
-  - There is no telling if this is a dirty hack or not because the only thing the langauge tries to stop you from doing is reassignment
+# My kind of Clojure
 
-- Short-and-terse trumps readable
-  - Proponents of certain languages (Java, Ruby etc...) clearly state that "being able to read code" is better than "the most functionalty you can squeeze into two lines"
-  - It may just be the Clojure I have seen so far (SO, clojuredoc, collegeues)
-  - I used to be proud that actual language constructs show up way down in some tiny little method with good name.
-  - In clojure reduce with an annonymous partial function which iteratoes over something you generated with with 6 nested function calls is actually "cool".
-     - All I have learned about small methods and small classes... Does not want to apply to Clojure?
+As part of my apprenticeship I have to learn a functional language.
+The functional language of choice here is Clojure.
+Its a LISP dialect that runs on the JVM.
 
-- No place for things
-  - There is no instinctive place to put things
-  - Yes you have namespaces, so do many other languages, but they also have 'classes' where I can add behaviour and data
-  - Maybe I should get my namespaces smaller?
-  - There is no "aftertaste" of doing everything in a gynormous file and there is no "pull" or clear seam where you'd move things into a separate class
+<!-- more -->
 
-- I see parens, parens everywhere
-  - I really do enjoy syntax. It gives distinctive things a distinctive look.
-  - Just having parens, functions and three-and-a-half datatypes is too little for me.
-  - paredit fixes this... but you get a chain of 12 parens at the end... and in JS people are ok to bitch-and-whine about it
+## I am not a fan of isomorphism
+Homoiconic means that data and code are representated using the same structures.
+This allows you to extend the language itself and do all kinds of tricks.
+Why do I not like it?
+I can't tell the difference between data and behaviour. 
+Function calls are just lists and you can pass around lists to make function calls.
+Vim tries really hard to get some kind of syntax highlighting, but its just too hard.
+The conciseness of the langauge means that no elements carry special meaning which could be distinguished visually.
+Coming from Java, where the distinction is crystal clear, my brain is missing visual clues when editiing Clojure.
 
-- Infix notation
-  - I dont really feel THAAAT bad about this one.
-  - It just leads to weird-to-read code
-  - (> (funny-func-1 dataaa?) (apply max (some-other-data)))
+## Short and terse
+The Clojure code I had seen so far gave me the impression that writing short, terse code was prefered over expressive and long names for individual functions
+that were composed of other methods.
+In the code I seen so far there were functions, but these had quite a few anonymous function _mapping_ and _reducing_ datastructures and whatnot.
+To me that is unreadable. 
+In my domain, _reduce_, _apply_ and _map_ have no meaning. 
+The actual conversions and selections that do happen are interesting, and they should be named.
+I propose to extract all of these little functions and promote them to real functions.
 
-- Concurrency is really not that far up on my 'to solve list'
-  - I have not been hit by mutable-state too often. Heck, I avoid it. I like immutabilty.
-  - I have not written heavily threaded or micro-optimized code where I had to manage threads myself.
-  - I HAVE had to deal my colleagues writing writing simple strings and other primitives all over the palce and me having to re-solve their problems!
+## Where to place things
+In OO languges there is a natural place to put things.
+If your class has too many attributes and you can see that some of those are always used together, break them out into their own class and move the behaviour.
+From Clojure I did not get that _feeling_. 
+I did create a couple of namespaces, but they more closely resembled classes in a OO language.
+Where do you draw the lines between namespaces?
+Functions _map_ datastrucutres all over the place.
+Collecting functions by what datastructures they work on might be a good approach.
 
-- Parameter explosion
-  - I feel like where in other languages I would have gathered params into an object, in Clojure I passed 14 params... dont worry, NOBODY cares about their types so you'll just spot those errors at runtime. Urgh.
+## Bottoms-up!
+In Clojure functions can only call functions which have already been declared.
+This means that your highlevel functions will end up being at the bottomg of the file since they will in turn call the other functions.
+If you have two mutually recursive calls, you need to use _forward declaration_ to get around the order propblem.
+From past experiences reading WSDL files, I feel like this is punishing the next reader. 
+Sure, when writing you know what is going on, but opening a file and then starting to scroll down to find the functions that actually matter is a big no-no.
 
-- Reading bottom up... really...
+## X Rules For Readable Clojure
 
+1. As few language constructors per functions as possible
+   _Apply_, _map_ and _reduce_ have no meaning in your domain. 
+   You should definitly use them, but give them a purpose-revealing name.
+   Not having more than one of these per function forces you to name things for what they are
 
-So Clojure is all about abstracting away state (simply not having it) so that your code will be easy to test, easy to reason about and scale massivly.
-I really wonder if legibility needed to take such a hit to achieve that.
-Obviously CLojure is built on the Lisp heritage that was written waaay before I started to code.
-In my head, Clojure (and Lisp and by extension 'pure functional programming') simply don't map well to how I think and how I feel things should be programmed.
-Having been introduced to Java as my second language (PERL being the first by selfstudy) probably brainwashed me to value certain things over others.
-Plus, during my apprenticeship and books and Meetups, values such as 'dont expose primitives' or name your domain concepts and promote them to meaningful things 
-has become really important to me. I try to carry that over into every new langague so my Clojure isnt really clojury and I probably try to bend it towards things that it doesnt want to do
+2. Forward-declare everything
+   Like in other programming langauges, important things go to the top.
+   The important functions, that give meaning to a namespace should wander all the way to the top of your file.
+   If you have any degenerate cases of datastructures you use, them place them close to where they are used. 
+   They give the reader importnat clues on what things look like.
+
+3. 
+
